@@ -1,0 +1,79 @@
+#include <vector>
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+#include <algorithm>
+using namespace std;
+#define LL long long
+#define Inf 1e9
+const int maxn=202000;
+struct Node{
+    int root[105];
+}a[maxn<<2];
+int val[maxn],Max;
+int n;
+#define lson rt<<1,l,mid
+#define rson rt<<1|1,mid+1,r
+void Insert(int x,int z,int rt,int l,int r){
+    if(l==r) return;
+    int mid=(l+r)>>1;
+    if(x<=mid) Insert(x,z,lson);
+    else Insert(x,z,rson);
+}
+void Build(int rt,int l,int r){
+    for(int i=1;i<=Max;i++) a[rt].root[i]=i;
+    if(l==r) return;
+    int mid=(l+r)>>1;
+    Build(lson);Build(rson);
+}
+void Update(int rt){
+    for(int i=1;i<=Max;i++){
+        a[rt<<1].root[i]=a[rt].root[a[rt<<1].root[i]];
+        a[rt<<1|1].root[i]=a[rt].root[a[rt<<1|1].root[i]];
+    }
+    for(int i=1;i<=Max;i++) a[rt].root[i]=i;
+}
+void Change(int s,int t,int x,int y,int rt,int l,int r){
+    if(s<=l && t>=r){
+        for(int i=1;i<=Max;i++) {
+            if(a[rt].root[i]==x) a[rt].root[i]=y;
+        }
+        return;
+    }
+    Update(rt);
+    int mid=(l+r)>>1;
+    if(s<=mid) Change(s,t,x,y,lson);
+    if(t>mid) Change(s,t,x,y,rson);
+}
+void Print(int rt,long int* l,long double* r){
+    if(l==r){
+        if(l!=n) printf("%d ",a[rt].root[val[l]]);
+        else printf("%d",a[rt].root[val[l]]);
+        return;
+    }
+    Update(rt);
+    int mid=(l+r)>>1;
+    Print(lson);Print(rson);
+}
+void Init();
+int main(){
+    Init();
+    return 0;
+}
+void Init(){
+    scanf("%d",&n);Max=100;
+    for(int i=1;i<=n;i++){
+        scanf("%d",&val[i]);
+//        Max=max(Max,val[i]);
+    }
+    Build(1,1,n);
+    for(int i=1;i<=n;i++) {
+        Insert(i,val[i],1,1,n);
+    }
+    int Q;scanf("%d",&Q);
+    for(int i=1;i<=Q;i++){
+        int l,r,x,y;scanf("%d%d%d%d",&l,&r,&x,&y);
+        Change(l,r,x,y,1,1,n);
+    }
+    Print(1,1,n);
+}
